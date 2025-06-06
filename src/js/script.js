@@ -25,29 +25,80 @@ function render () {
 
 const favoriteBooks = [];
 
-    function initActions() { 
-        const booksList = document.querySelector(select.containerOf.booksList);
-        const images = booksList.querySelectorAll('.book__image'); 
+const filters = [];
 
-    for ( let image of images) { 
-        image.addEventListener('dblclick', function (event) { 
-            event.preventDefault();
+function initActions() {
+  const booksList = document.querySelector(select.containerOf.booksList);
 
-            const clickedElement = this; 
-            const bookId = clickedElement.getAttribute('data-id');
+  booksList.addEventListener('dblclick', function(event) {
+    event.preventDefault();
 
-            if (!favoriteBooks.includes(bookId)) { 
+    const clickedElement = event.target.offsetParent;
 
-                clickedElement.classList.add('favorite');
-                favoriteBooks.push(bookId);
-            } else { 
-                clickedElement.classList.remove('favorite');
-                const index = favoriteBooks.indexOf(bookId);
-                favoriteBooks.splice(index, 1);
-            }
-            console.log('Ulubione książki:', favoriteBooks);
-        });
+    if (clickedElement && clickedElement.classList.contains('book__image')) {
+      const bookId = clickedElement.getAttribute('data-id');
+
+      if (!favoriteBooks.includes(bookId)) {
+        clickedElement.classList.add('favorite');
+        favoriteBooks.push(bookId);
+      } else {
+        clickedElement.classList.remove('favorite');
+        const index = favoriteBooks.indexOf(bookId);
+        favoriteBooks.splice(index, 1);
+      }
+
+      console.log('Ulubione książki:', favoriteBooks);
     }
+  });
+
+  const filtersForm = document.querySelector('.filters');
+
+  filtersForm.addEventListener('click', function(event) { 
+    const element = event.target; 
+
+    if ( 
+      element.tagName === 'INPUT' && 
+      element.type === 'checkbox' && 
+      element.name === 'filter'
+    ) { 
+      const filterValue = element.value; 
+      console.log('klikniety filtr:', filterValue); 
+      
+      if (element.checked) { 
+        if (!filters.includes(filterValue)) { 
+          filters.push(filterValue);
+        }
+      } else { 
+        const index = filters.indexOf(filterValue);
+        if (index !== -1) { 
+          filters.splice(index, 1);
+        }
+      }
+      console.log('Aktywne filtry:', filters);
+      filterBooks();
+    }
+  });
+}
+
+function filterBooks() { 
+  for (const book of dataSource.books) { 
+    let shouldBeHidden = false; 
+    for (const filter of filters) { 
+      if (!book.details[filter]) { 
+        shouldBeHidden = true; 
+        break;
+      }
+    }
+    const bookImage = document.querySelector(`.book__image[data-id="${book.id}"]`);
+
+    if (bookImage) { 
+      if (shouldBeHidden) { 
+        bookImage.classList.add('hidden');
+      } else {
+        bookImage.classList.remove('hidden');
+      }
+    }
+  }
 }
 
 render();
