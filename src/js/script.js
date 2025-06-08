@@ -23,13 +23,16 @@ class BooksList {
       const ratingBgc = this.determineRatingBgc(book.rating);
       const ratingWidth = book.rating * 10;
 
-      const generatedHTML = Handlebars.compile(
+      const template = Handlebars.compile(
         document.querySelector('#template-book').innerHTML
-      )({
-        ...book,
-        ratingBgc: ratingBgc,
-        ratingWidth: ratingWidth,
-      });
+      );
+
+      const generatedHTML = template(
+        Object.assign({}, book, {
+          ratingBgc: ratingBgc,
+          ratingWidth: ratingWidth,
+        })
+      );
 
       const element = utils.createDOMFromHTML(generatedHTML);
       this.dom.booksList.appendChild(element);
@@ -122,4 +125,4 @@ class BooksList {
   }
 }
 
-const app = new BooksList();
+const app = new BooksList(); // eslint-disable-line no-unused-vars
